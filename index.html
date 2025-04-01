@@ -255,10 +255,10 @@
         <div class="card" id="card">
             <div class="front" id="cardFront">
                 <h2>ส่งกำลังใจ</h2>
-                <button onclick="flipCard()">กรุณากดปุ่ม</button>
+                <button onclick="flipCard()">ถัดไป</button>
             </div>
             <div class="back">
-                <h3>ลงนามถวายพระพร</h3>
+                <h3>เลือกรูปแบบ</h3>
                 <select id="messageType" onchange="updateBlessingOptions()">
                     <option value="royal">ลงนามถวายพระพร</option>
                     <option value="festival">อวยพรตามเทศกาล</option>
@@ -272,7 +272,7 @@
                 </select>
                 <textarea id="customMessage" placeholder="พิมพ์คำอวยพรของคุณ"></textarea>
                 <input type="text" id="firstName" placeholder="ชื่อ-นามสกุล">
-                <input type="text" id="lastName" placeholder="หน่วยงาน/จังหวัด">
+                <input type="text" id="lastName" placeholder="ข้อความ/หน่วยงาน/จังหวัด หรือ -">
                 <button onclick="submitBlessing()">บันทึกและส่ง</button>
             </div>
         </div>
@@ -490,13 +490,13 @@
             const message = `<b>📜 ${messageTypeText}</b>\n\n` +
                            `<b>คำอวยพร:</b> ${blessingText}\n` +
                            `<b>ชื่อ-นามสกุล:</b> ${firstName}\n` +
-                           `<b>หน่วยงาน/จังหวัด:</b> ${lastName}\n` +
+                           `<b>ข้อความ :</b> ${lastName}\n` +
                            `\n<i>วันที่:</i> ${new Date().toLocaleString('th-TH')}`;
 
             const popupMessage = `📜 ${messageTypeText}\n\n` +
                                  `คำอวยพร: ${blessingText}\n` +
                                  `ชื่อ-นามสกุล: ${firstName}\n` +
-                                 `หน่วยงาน/จังหวัด: ${lastName}\n` +
+                                 `ข้อความ : ${lastName}\n` +
                                  `วันที่: ${new Date().toLocaleString('th-TH')}`;
 
             showProgress();

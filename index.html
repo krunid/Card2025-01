@@ -73,7 +73,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .front {
-            background: url('https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg') center/cover;
+            background: url('https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg') center/contain no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -121,7 +121,6 @@
             padding: 1% 0;
             font-size: clamp(12px, 1.5vw, 16px);
         }
-        /* Progress Bar Styles */
         .progress-overlay {
             display: none;
             position: fixed;
@@ -151,7 +150,6 @@
             color: white;
             font-weight: bold;
         }
-        /* Popup Styles (สำหรับแจ้งผล) */
         .popup {
             display: none;
             position: fixed;
@@ -181,7 +179,6 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
-        /* Image Change Popup Styles (สำหรับอัปโหลดรูปภาพ) */
         .image-change-popup {
             display: none;
             position: fixed;
@@ -220,17 +217,14 @@
         .image-change-popup .close-btn:hover {
             background-color: #d32f2f;
         }
-        /* DateTime Styles */
         .datetime {
             color: white;
             font-size: clamp(12px, 1.5vw, 16px);
             padding: 0.8% 1.5%;
         }
-        /* Custom Message Styles */
         #customMessage {
             display: none;
         }
-        /* Media Queries */
         @media (max-width: 600px) {
             .card-container {
                 width: 90vw;
@@ -294,14 +288,14 @@
         </div>
     </div>
 
-    <!-- Popup HTML (สำหรับแจ้งผล) -->
+    <!-- Popup HTML -->
     <div class="popup-overlay" id="popupOverlay"></div>
     <div class="popup" id="popup">
         <p id="popupMessage"></p>
         <button onclick="hidePopup()">ตกลง</button>
     </div>
 
-    <!-- Image Change Popup HTML (สำหรับอัปโหลดรูปภาพ) -->
+    <!-- Image Change Popup HTML -->
     <div class="popup-overlay" id="imageChangeOverlay"></div>
     <div class="image-change-popup" id="imageChangePopup">
         <h3>อัปโหลดรูปภาพ</h3>
@@ -313,13 +307,9 @@
     </div>
 
     <script>
-        // ตัวแปรเก็บ URL รูปภาพปัจจุบัน (เริ่มต้นจาก URL ค่าเริ่มต้น)
         let currentImageUrl = localStorage.getItem('currentImage') || 'https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg';
+        document.getElementById('cardFront').style.background = `url('${currentImageUrl}') center/contain no-repeat`;
 
-        // ตั้งค่ารูปภาพเริ่มต้นจาก localStorage
-        document.getElementById('cardFront').style.background = `url('${currentImageUrl}') center/cover`;
-
-        // ตัวเลือกคำอวยพรสำหรับแต่ละประเภท
         const blessingOptions = {
             royal: [
                 { value: "1", text: "ขอพระองค์ทรงพระเจริญยิ่งยืนนาน" },
@@ -336,17 +326,15 @@
             encouragement: [
                 { value: "1", text: "สู้ๆ นะ ขอให้ผ่านพ้นทุกอุปสรรค" },
                 { value: "2", text: "ขอให้มีกำลังใจที่ดีในทุกๆ วัน" },
-                { value: "3", text: "คุณทำได้! ขอให้ประสบความสำเร็จ" },
+                { value: "3", text: "คุณทำได้! ขอให้ประSuccesสำเร็จ" },
                 { value: "custom", text: "พิมพ์เอง" }
             ]
         };
 
-        // ฟังก์ชันสำหรับอัปเดตตัวเลือกคำอวยพรตามประเภท
         function updateBlessingOptions() {
             const messageType = document.getElementById('messageType').value;
             const blessingSelect = document.getElementById('blessing');
             blessingSelect.innerHTML = '';
-
             const options = blessingOptions[messageType];
             options.forEach(option => {
                 const opt = document.createElement('option');
@@ -354,11 +342,9 @@
                 opt.textContent = option.text;
                 blessingSelect.appendChild(opt);
             });
-
             toggleCustomMessage();
         }
 
-        // ฟังก์ชันสำหรับแสดง/ซ่อน textarea สำหรับพิมพ์เอง
         function toggleCustomMessage() {
             const blessingSelect = document.getElementById('blessing');
             const customMessage = document.getElementById('customMessage');
@@ -370,7 +356,6 @@
             }
         }
 
-        // ฟังก์ชันสำหรับอัปเดตวันที่และเวลา
         function updateDateTime() {
             const now = new Date();
             const options = {
@@ -388,9 +373,7 @@
             document.getElementById('datetime').textContent = dateTimeString;
         }
 
-        // อัปเดตวันที่และเวลาเมื่อโหลดหน้า
         updateDateTime();
-        // อัปเดตทุกวินาที
         setInterval(updateDateTime, 1000);
 
         function showProgress() {
@@ -400,7 +383,6 @@
             let progress = 0;
             progressBar.style.width = '0%';
             progressBar.textContent = '0%';
-
             const interval = setInterval(() => {
                 progress += 10;
                 progressBar.style.width = `${progress}%`;
@@ -449,10 +431,9 @@
                     const imageDataUrl = e.target.result;
                     showProgress();
                     setTimeout(() => {
-                        // บันทึก Data URL ลงใน localStorage
                         localStorage.setItem('currentImage', imageDataUrl);
                         currentImageUrl = imageDataUrl;
-                        document.getElementById('cardFront').style.background = `url('${imageDataUrl}') center/cover`;
+                        document.getElementById('cardFront').style.background = `url('${imageDataUrl}') center/contain no-repeat`;
                         hideProgress();
                         hideImageChangePopup();
                         showPopup('อัปโหลดรูปภาพสำเร็จ!');
@@ -464,7 +445,6 @@
             }
         }
 
-        // ฟังก์ชันแปลง Data URL เป็น Blob
         function dataURLtoBlob(dataURL) {
             const arr = dataURL.split(',');
             const mime = arr[0].match(/:(.*?);/)[1];
@@ -549,8 +529,6 @@
             const botToken = localStorage.getItem('botToken');
             const chatId = localStorage.getItem('chatId');
             const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
-
-            // แปลง Data URL เป็น Blob
             const blob = dataURLtoBlob(currentImageUrl);
             const formData = new FormData();
             formData.append('chat_id', chatId);
@@ -571,7 +549,6 @@
                 .then(response => response.json());
         }
 
-        // เรียกฟังก์ชันเริ่มต้นเพื่อตั้งค่าตัวเลือกคำอวยพร
         updateBlessingOptions();
     </script>
 </body>

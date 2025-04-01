@@ -6,6 +6,9 @@
     <title>ลงนามถวายพระพร</title>
     <!-- เพิ่ม Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- เพิ่ม Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -313,6 +316,17 @@
     </div>
 
     <script>
+        // ตั้งค่า Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+
         // ตัวแปรเก็บ URL รูปภาพปัจจุบัน
         let currentImageUrl = 'https://fz.lnwfile.com/_/fz/_raw/cl/91/eh.jpg';
 
@@ -363,7 +377,7 @@
                 customMessage.style.display = 'block';
             } else {
                 customMessage.style.display = 'none';
-                customMessage.value = ''; // รีเซ็ตข้อความเมื่อเลือกตัวเลือกสำเร็จรูป
+                customMessage.value = '';
             }
         }
 
@@ -441,19 +455,20 @@
         function changeImage() {
             const imageFile = document.getElementById('imageFile').files[0];
             if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageDataUrl = e.target.result;
-                    showProgress();
-                    setTimeout(() => {
-                        document.getElementById('cardFront').style.background = `url('${imageDataUrl}') center/cover`;
-                        currentImageUrl = imageDataUrl;
+                showProgress();
+                const storageRef = firebase.storage().ref('images/' + Date.now() + '_' + imageFile.name);
+                storageRef.put(imageFile).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(downloadURL => {
+                        document.getElementById('cardFront').style.background = `url('${downloadURL}') center/cover`;
+                        currentImageUrl = downloadURL;
                         hideProgress();
                         hideImageChangePopup();
                         showPopup('อัปโหลดรูปภาพสำเร็จ!');
-                    }, 1000);
-                };
-                reader.readAsDataURL(imageFile);
+                    });
+                }).catch(error => {
+                    hideProgress();
+                    showPopup('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ: ' + error.message);
+                });
             } else {
                 showPopup('กรุณาเลือกไฟล์รูปภาพ');
             }
@@ -473,7 +488,6 @@
             const blessingSelect = document.getElementById('blessing');
             let blessingText = blessingSelect.options[blessingSelect.selectedIndex].text;
 
-            // หากเลือก "พิมพ์เอง" ให้ใช้ข้อความจาก textarea
             if (blessingSelect.value === 'custom') {
                 blessingText = document.getElementById('customMessage').value.trim();
                 if (!blessingText) {

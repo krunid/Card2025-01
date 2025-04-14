@@ -309,8 +309,41 @@
 
     <script>
         let currentImageUrl = localStorage.getItem('currentImage') || 'https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg';
-        document.getElementById('cardFront').style.background = `url('${currentImageUrl}') center/contain no-repeat`;
 
+        // กำหนดวันที่เทศกาลและภาพที่เกี่ยวข้อง
+        const festivalImages = {
+            '04-14': { // วันครอบครัว: 14 เมษายน
+                url: 'https://www.example.com/images/family_day.jpg',
+                alt: 'ภาพครอบครัวอบอุ่นในวันครอบครัว'
+            },
+            '01-01': { // ปีใหม่: 1 มกราคม
+                url: 'https://www.example.com/images/new_year.jpg',
+                alt: 'ภาพเฉลิมฉลองปีใหม่'
+            },
+            '04-13': { // สงกรานต์: 13-15 เมษายน
+                url: 'https://www.example.com/images/songkran.jpg',
+                alt: 'ภาพการสาดน้ำในวันสงกรานต์'
+            },
+            '04-14-songkran': { // สงกรานต์วันที่ 14
+                url: 'https://www.example.com/images/songkran.jpg',
+                alt: 'ภาพการสาดน้ำในวันสงกรานต์'
+            },
+            '04-15': { // สงกรานต์วันที่ 15
+                url: 'https://www.example.com/images/songkran.jpg',
+                alt: 'ภาพการสาดน้ำในวันสงกรานต์'
+            },
+            '12-25': { // คริสต์มาส: 25 ธันวาคม
+                url: 'https://www.example.com/images/christmas.jpg',
+                alt: 'ภาพต้นคริสต์มาสและของขวัญ'
+            },
+            '11-12': { // ลอยกระทง: วันที่เปลี่ยนทุกปี (ตัวอย่าง 12 พ.ย. 2025)
+                url: 'https://www.example.com/images/loy_krathong.jpg',
+                alt: 'ภาพกระทงลอยในแม่น้ำยามค่ำคืน'
+            }
+            // วันพระจะถูกจัดการแยกในฟังก์ชัน updateFestivalImage
+        };
+
+        // อ็อบเจ็กต์สำหรับข้อความอวยพร
         const blessingOptions = {
             festival: [
                 { value: "1", text: "สวัสดีปีใหม่ ขอให้มีความสุขตลอดปี" },
@@ -341,6 +374,37 @@
             ]
         };
 
+        // ฟังก์ชันตรวจสอบวันที่และเปลี่ยนภาพตามเทศกาล
+        function updateFestivalImage() {
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // เดือน 01-12
+            const day = String(now.getDate()).padStart(2, '0'); // วัน 01-31
+            const dateKey = `${month}-${day}`;
+            const cardFront = document.getElementById('cardFront');
+
+            // ตรวจสอบวันพระ (คำนวณง่ายๆ โดยสมมติวันพระทุก 7 วัน เช่น วันที่ 7, 14, 21, 28)
+            const isBuddhistDay = [7, 14, 21, 28].includes(now.getDate());
+            if (isBuddhistDay) {
+                cardFront.style.background = `url('https://www.example.com/images/buddhist_day.jpg') center/contain no-repeat`;
+                return;
+            }
+
+            // ตรวจสอบเทศกาลอื่นๆ
+            if (festivalImages[dateKey]) {
+                cardFront.style.background = `url('${festivalImages[dateKey].url}') center/contain no-repeat`;
+            } else if (dateKey === '04-14') {
+                // กรณีวันที่ 14 เมษายนเป็นวันครอบครัว (ถ้าไม่มีสงกรานต์ทับ)
+                cardFront.style.background = `url('${festivalImages['04-14'].url}') center/contain no-repeat`;
+            } else {
+                // ใช้ภาพเริ่มต้นถ้าไม่ใช่วันเทศกาล
+                cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
+            }
+        }
+
+        // อัปเดตภาพเมื่อโหลดหน้าเว็บ
+        updateFestivalImage();
+
+        // อัปเดตตัวเลือกคำอวยพร
         function updateBlessingOptions() {
             const messageType = document.getElementById('messageType').value;
             const blessingSelect = document.getElementById('blessing');

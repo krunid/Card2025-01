@@ -73,7 +73,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .front {
-            background: url('https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg') center/contain no-repeat;
+            background: url('image/default.jpg') center/contain no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -324,62 +324,62 @@
     </div>
 
     <script>
-        let currentImageUrl = localStorage.getItem('currentImage') || 'https://i.pinimg.com/736x/6b/2b/10/6b2b106ee04800cdd7c4127520156df1.jpg';
+        let currentImageUrl = localStorage.getItem('currentImage') || 'image/default.jpg';
 
         // กำหนดวันที่เทศกาลและภาพที่เกี่ยวข้อง
         const festivalImages = {
             '04-14': { // วันครอบครัว: 14 เมษายน
-                url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/family_day.jpg',
                 alt: 'ภาพครอบครัวอบอุ่นในวันครอบครัว',
                 message: 'สุขสันต์วันครอบครัว'
             },
             '01-01': { // ปีใหม่: 1 มกราคม
-                url: 'https://images.unsplash.com/photo-1483794344538-d0d202bb8a5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/new_year.jpg',
                 alt: 'ภาพดอกไม้ไฟเฉลิมฉลองปีใหม่',
                 message: 'สวัสดีปีใหม่'
             },
             '04-13': { // สงกรานต์: 13-15 เมษายน
-                url: 'https://images.pexels.com/photos/10540426/pexels-photo-10540426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '04-14-songkran': { // สงกรานต์วันที่ 14
-                url: 'https://images.pexels.com/photos/10540426/pexels-photo-10540426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '04-15': { // สงกรานต์วันที่ 15
-                url: 'https://images.pexels.com/photos/10540426/pexels-photo-10540426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '12-25': { // คริสต์มาส: 25 ธันวาคม
-                url: 'https://images.unsplash.com/photo-1481279407070-6cd2e1b3989f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/christmas.jpg',
                 alt: 'ภาพต้นคริสต์มาสและของขวัญ',
                 message: 'สุขสันต์วันคริสต์มาส'
             },
             '11-12': { // ลอยกระทง: ตัวอย่าง 12 พ.ย. 2025
-                url: 'https://images.pexels.com/photos/10540297/pexels-photo-10540297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                url: 'image/loy_krathong.jpg',
                 alt: 'ภาพกระทงลอยในแม่น้ำยามค่ำคืน',
                 message: 'สุขสันต์วันลอยกระทง'
             },
             '01-29': { // ตรุษจีน: ตัวอย่าง 29 ม.ค. 2025
-                url: 'https://images.unsplash.com/photo-1579271162736-c3e7bd86e675?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/chinese_new_year.jpg',
                 alt: 'ภาพโคมแดงในวันตรุษจีน',
                 message: 'สวัสดีวันตรุษจีน'
             },
             '02-14': { // วาเลนไทน์: 14 ก.พ.
-                url: 'https://images.pexels.com/photos/1407354/pexels-photo-1407354.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                url: 'image/valentine.jpg',
                 alt: 'ภาพหัวใจและดอกกุหลาบในวันวาเลนไทน์',
                 message: 'รักหวานฉ่ำในวันวาเลนไทน์'
             },
             '02-12': { // วันมาฆบูชา: ตัวอย่าง 12 ก.พ. 2025
-                url: 'https://images.unsplash.com/photo-1602235839487-7a74d90dc803?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/makha_bucha.jpg',
                 alt: 'ภาพเทียนในพิธีเวียนเทียนวันมาฆบูชา',
                 message: 'วันมาฆบูชา ขอให้จิตใจสงบ'
             },
             'buddhist': { // วันพระ
-                url: 'https://images.unsplash.com/photo-1592760000000-000000000000?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80',
+                url: 'image/buddhist_day.jpg',
                 alt: 'ภาพพระพุทธรูปในวันพระ',
                 message: 'วันพระ ขอให้จิตใจผ่องใส'
             }

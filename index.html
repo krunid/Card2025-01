@@ -347,12 +347,6 @@
         };
 
         function updateBlessingOptions() {
-            if (messageType === 'buddhistDay') {
-                const buddhistImage = 'https://i.pinimg.com/736x/75/94/5f/75945f6d9bd0cb1ec3c85eab249cf77d.jpg';
-                localStorage.setItem('currentImage', buddhistImage);
-                document.getElementById('cardFront').style.background = `url('${buddhistImage}') center/contain no-repeat`;
-            }
-            
             const messageType = document.getElementById('messageType').value;
             const blessingSelect = document.getElementById('blessing');
             blessingSelect.innerHTML = '';

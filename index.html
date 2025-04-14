@@ -74,6 +74,7 @@
         }
         .front {
             background: url('image/default.jpg') center/contain no-repeat;
+            background-size: contain;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -189,7 +190,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
-        .image-select-popup {
+        .image-popup {
             display: none;
             position: fixed;
             top: 50%;
@@ -203,28 +204,28 @@
             text-align: center;
             width: 300px;
         }
-        .image-select-popup h3 {
+        .image-popup h3 {
             margin-bottom: 15px;
             font-size: clamp(16px, 2vw, 20px);
         }
-        .image-select-popup select {
+        .image-popup select, .image-popup input {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
             font-size: clamp(12px, 1.5vw, 16px);
         }
-        .image-select-popup .button-group {
+        .image-popup .button-group {
             display: flex;
             justify-content: space-between;
         }
-        .image-select-popup button {
+        .image-popup button {
             width: 48%;
             padding: 8px;
         }
-        .image-select-popup .close-btn {
+        .image-popup .close-btn {
             background-color: #f44336;
         }
-        .image-select-popup .close-btn:hover {
+        .image-popup .close-btn:hover {
             background-color: #d32f2f;
         }
         .datetime {
@@ -246,7 +247,7 @@
             .datetime {
                 font-size: clamp(10px, 1.2vw, 14px);
             }
-            .image-select-popup {
+            .image-popup {
                 width: 90%;
             }
             .front .festival-message {
@@ -259,7 +260,7 @@
     <div class="navbar">
         <div class="datetime" id="datetime"></div>
         <div class="right-links">
-            <a href="#" onclick="showImageSelectPopup()"><i class="fas fa-image"></i></a>
+            <a href="#" onclick="showImagePopup()"><i class="fas fa-image"></i></a>
             <a href="settings.html"><i class="fas fa-cog"></i></a>
         </div>
     </div>
@@ -312,16 +313,17 @@
         <button onclick="hidePopup()">ตกลง</button>
     </div>
 
-    <!-- Image Select Popup HTML -->
-    <div class="popup-overlay" id="imageSelectOverlay"></div>
-    <div class="image-select-popup" id="imageSelectPopup">
+    <!-- Image Popup HTML -->
+    <div class="popup-overlay" id="imagePopupOverlay"></div>
+    <div class="image-popup" id="imagePopup">
         <h3>เลือกรูปภาพ</h3>
         <select id="imageSelect">
             <!-- ตัวเลือกจะถูกเพิ่มโดย JavaScript -->
         </select>
+        <input type="file" id="imageFile" accept="image/*">
         <div class="button-group">
-            <button onclick="changeImage()">เลือก</button>
-            <button class="close-btn" onclick="hideImageSelectPopup()">ปิด</button>
+            <button onclick="changeImage()">ยืนยัน</button>
+            <button class="close-btn" onclick="hideImagePopup()">ปิด</button>
         </div>
     </div>
 
@@ -452,6 +454,7 @@
         function updateCardImage() {
             const cardFront = document.getElementById('cardFront');
             cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
+            cardFront.style.backgroundSize = 'contain';
         }
 
         // อัปเดตภาพและข้อความเมื่อโหลดหน้าเว็บ
@@ -540,7 +543,7 @@
             document.getElementById('popupOverlay').style.display = 'none';
         }
 
-        function showImageSelectPopup() {
+        function showImagePopup() {
             const imageSelect = document.getElementById('imageSelect');
             imageSelect.innerHTML = '';
             availableImages.forEach(image => {
@@ -549,31 +552,53 @@
                 opt.textContent = image.text;
                 imageSelect.appendChild(opt);
             });
-            // ตั้งค่าเริ่มต้นเป็นภาพปัจจุบัน
-            imageSelect.value = currentImageUrl;
-            document.getElementById('imageSelectPopup').style.display = 'block';
-            document.getElementById('imageSelectOverlay').style.display = 'block';
+            // ตั้งค่าเริ่มต้นเป็นภาพปัจจุบัน (ถ้าเป็นพาธใน \image\)
+            if (currentImageUrl.startsWith('image/')) {
+                imageSelect.value = currentImageUrl;
+            }
+            document.getElementById('imageFile').value = ''; // รีเซ็ตช่องอัปโหลด
+            document.getElementById('imagePopup').style.display = 'block';
+            document.getElementById('imagePopupOverlay').style.display = 'block';
         }
 
-        function hideImageSelectPopup() {
-            document.getElementById('imageSelectPopup').style.display = 'none';
-            document.getElementById('imageSelectOverlay').style.display = 'none';
+        function hideImagePopup() {
+            document.getElementById('imagePopup').style.display = 'none';
+            document.getElementById('imagePopupOverlay').style.display = 'none';
         }
 
         function changeImage() {
             const imageSelect = document.getElementById('imageSelect').value;
-            if (imageSelect) {
+            const imageFile = document.getElementById('imageFile').files[0];
+
+            if (imageFile) {
+                // กรณีอัปโหลดภาพ
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDataUrl = e.target.result;
+                    showProgress();
+                    setTimeout(() => {
+                        localStorage.setItem('currentImage', imageDataUrl);
+                        currentImageUrl = imageDataUrl;
+                        updateCardImage();
+                        hideProgress();
+                        hideImagePopup();
+                        showPopup('อัปโหลดรูปภาพสำเร็จ!');
+                    }, 1000);
+                };
+                reader.readAsDataURL(imageFile);
+            } else if (imageSelect) {
+                // กรณีเลือกภาพจาก \image\
                 showProgress();
                 setTimeout(() => {
                     localStorage.setItem('currentImage', imageSelect);
                     currentImageUrl = imageSelect;
                     updateCardImage();
                     hideProgress();
-                    hideImageSelectPopup();
+                    hideImagePopup();
                     showPopup('เปลี่ยนรูปภาพสำเร็จ!');
                 }, 1000);
             } else {
-                showPopup('กรุณาเลือกรูปภาพ');
+                showPopup('กรุณาเลือกรูปภาพหรืออัปโหลดไฟล์');
             }
         }
 
@@ -662,10 +687,13 @@
             const chatId = localStorage.getItem('chatId');
             const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
-            // ถ้า currentImageUrl เป็นพาธไฟล์ใน \image\ ให้โหลดเป็น Blob
             if (currentImageUrl.startsWith('image/')) {
+                // กรณีเป็นพาธไฟล์ใน \image\
                 return fetch(currentImageUrl)
-                    .then(response => response.blob())
+                    .then(response => {
+                        if (!response.ok) throw new Error('ไม่สามารถโหลดภาพจาก \image\');
+                        return response.blob();
+                    })
                     .then(blob => {
                         const formData = new FormData();
                         formData.append('chat_id', chatId);
@@ -676,15 +704,19 @@
                         }).then(response => response.json());
                     });
             } else {
-                // กรณีเป็น Data URL จากการอัปโหลดครั้งก่อน (ถ้ามี)
-                const blob = dataURLtoBlob(currentImageUrl);
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('photo', blob, 'image.jpg');
-                return fetch(url, {
-                    method: 'POST',
-                    body: formData
-                }).then(response => response.json());
+                // กรณีเป็น Data URL จากการอัปโหลด
+                try {
+                    const blob = dataURLtoBlob(currentImageUrl);
+                    const formData = new FormData();
+                    formData.append('chat_id', chatId);
+                    formData.append('photo', blob, 'image.jpg');
+                    return fetch(url, {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.json());
+                } catch (error) {
+                    throw new Error('ไม่สามารถแปลงภาพที่อัปโหลดได้');
+                }
             }
         }
 

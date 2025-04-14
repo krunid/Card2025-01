@@ -335,6 +335,7 @@
                 { value: "1", text: "ทำดีได้ดี ทำชั่วได้ชั่ว" },
                 { value: "2", text: "จงทำวันนี้ให้ดีที่สุด เพราะพรุ่งนี้ยังมาไม่ถึง" },
                 { value: "3", text: "ใจเย็นเป็นน้ำ ใจร้อนเป็นไฟ" },
+                { value: "4", text: "ความเพียรย่อมนำมาซึ่งความสำเร็จ" },
                 { value: "custom", text: "พิมพ์เอง" }
             ],
             encouragement: [
@@ -357,6 +358,11 @@
                 blessingSelect.appendChild(opt);
             });
             toggleCustomMessage();
+            if (messageType === 'buddhistDay') {
+                const buddhistImage = 'https://i.pinimg.com/736x/75/94/5f/75945f6d9bd0cb1ec3c85eab249cf77d.jpg';
+                localStorage.setItem('currentImage', buddhistImage);
+                document.getElementById('cardFront').style.background = `url('${buddhistImage}') center/contain no-repeat`;
+            }
         }
 
         function toggleCustomMessage() {

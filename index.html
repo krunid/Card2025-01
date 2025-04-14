@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ส่งกำลังใจ</title>
-    <!-- เพิ่ม Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -18,7 +17,7 @@
             flex-direction: column;
             min-height: 100vh;
             background: url('https://images.dmc.tv/wallpaper/raw/14180.jpg') center/cover no-repeat;
-            touch-action: manipulation; /* ป้องกันการซูมเมื่อแตะบน iPad */
+            touch-action: manipulation;
         }
         .navbar {
             width: 100%;
@@ -62,7 +61,7 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            transition: transform 0.8s;
+            transition: transform 0.8s ease;
         }
         .card.flipped {
             transform: rotateY(180deg);
@@ -116,13 +115,17 @@
             height: 100px;
         }
         button {
-            padding: 2.5% 6%;
+            padding: 4% 8%;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: clamp(14px, 2.5vw, 18px);
+            font-size: clamp(16px, 3vw, 20px);
+            min-height: 50px;
+            min-width: 120px;
+            margin: 1%;
+            transition: background-color 0.2s ease;
         }
         button:hover, button:active {
             background-color: #45a049;
@@ -182,9 +185,9 @@
         }
         .popup button {
             margin-top: 15px;
-            background-color: #4CAF50;
-            padding: 10px 20px;
-            font-size: clamp(14px, 2vw, 18px);
+            padding: 12px 24px;
+            min-width: 100px;
+            font-size: clamp(16px, 3vw, 20px);
         }
         .popup-overlay {
             display: none;
@@ -203,12 +206,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             z-index: 1001;
             text-align: center;
-            width: 400px;
+            width: 450px;
             max-width: 90%;
         }
         .image-popup h3 {
@@ -217,24 +220,40 @@
         }
         .image-popup select, .image-popup input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             font-size: clamp(14px, 2.5vw, 18px);
         }
         .image-popup .button-group {
             display: flex;
             justify-content: space-between;
+            margin-top: 20px;
         }
         .image-popup button {
             width: 48%;
-            padding: 10px;
-            font-size: clamp(14px, 2.5vw, 18px);
+            padding: 15px;
+            font-size: clamp(16px, 3vw, 20px);
+            min-height: 50px;
         }
         .image-popup .close-btn {
             background-color: #f44336;
         }
         .image-popup .close-btn:hover, .image-popup .close-btn:active {
             background-color: #d32f2f;
+        }
+        .image-preview {
+            margin: 15px 0;
+            text-align: center;
+        }
+        .image-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .image-preview p {
+            color: #666;
+            font-size: clamp(12px, 2vw, 16px);
         }
         .datetime {
             color: white;
@@ -264,11 +283,19 @@
             .front h2, .back h3 {
                 font-size: clamp(19px, 3.2vw, 24px);
             }
-            select, input, textarea, button {
+            select, input, textarea {
                 font-size: clamp(13px, 2.2vw, 17px);
             }
+            button {
+                font-size: clamp(15px, 2.8vw, 19px);
+                padding: 3.5% 7%;
+            }
             .image-popup {
-                width: 380px;
+                width: 420px;
+            }
+            .image-popup button {
+                font-size: clamp(15px, 2.8vw, 19px);
+                padding: 12px;
             }
         }
         @media (max-width: 1180px) {
@@ -279,7 +306,7 @@
                 max-height: 900px;
             }
             .image-popup {
-                width: 350px;
+                width: 380px;
             }
         }
     </style>
@@ -288,7 +315,7 @@
     <div class="navbar">
         <div class="datetime" id="datetime"></div>
         <div class="right-links">
-            <a href="#" onclick="showImagePopup()"><i class="fas fa-image"></i></a>
+            <a href="#" id="imagePopupLink"><i class="fas fa-image"></i></a>
             <a href="settings.html"><i class="fas fa-cog"></i></a>
         </div>
     </div>
@@ -299,7 +326,7 @@
                 <div class="festival-message" id="festivalMessage"></div>
                 <div>
                     <h2>ส่งกำลังใจ</h2>
-                    <button onclick="flipCard()">ถัดไป</button>
+                    <button id="flipButton">ถัดไป</button>
                 </div>
             </div>
             <div class="back">
@@ -327,30 +354,30 @@
         <p>© 2025 ส่งกำลังใจ | พัฒนาโดย ครูนิด ศิษย์หลวงพ่อเสือ เขียนโปแกรมโดย xAI</p>
     </footer>
 
-    <!-- Progress Bar HTML -->
     <div class="progress-overlay" id="progressOverlay">
         <div class="progress-bar-container">
             <div class="progress-bar" id="progressBar">0%</div>
         </div>
     </div>
 
-    <!-- Popup HTML -->
     <div class="popup-overlay" id="popupOverlay"></div>
     <div class="popup" id="popup">
         <p id="popupMessage"></p>
         <button onclick="hidePopup()">ตกลง</button>
     </div>
 
-    <!-- Image Popup HTML -->
     <div class="popup-overlay" id="imagePopupOverlay"></div>
     <div class="image-popup" id="imagePopup">
         <h3>เลือกรูปภาพ</h3>
-        <select id="imageSelect">
+        <select id="imageSelect" onchange="updateImagePreview()">
             <!-- ตัวเลือกจะถูกเพิ่มโดย JavaScript -->
         </select>
         <input type="file" id="imageFile" accept="image/*">
+        <div class="image-preview" id="imagePreview">
+            <p>เลือกภาพเพื่อดูตัวอย่าง</p>
+        </div>
         <div class="button-group">
-            <button onclick="changeImage()">ยืนยัน</button>
+            <button id="confirmImageButton">ยืนยัน</button>
             <button class="close-btn" onclick="hideImagePopup()">ปิด</button>
         </div>
     </div>
@@ -358,7 +385,6 @@
     <script>
         let currentImageUrl = localStorage.getItem('currentImage') || 'image/default.jpg';
 
-        // รายการภาพที่สามารถเลือกได้จาก \image\
         const availableImages = [
             { value: 'image/default.jpg', text: 'ภาพเริ่มต้น' },
             { value: 'image/family_day.jpg', text: 'วันครอบครัว' },
@@ -372,55 +398,27 @@
             { value: 'image/makha_bucha.jpg', text: 'วันมาฆบูชา' }
         ];
 
-        // กำหนดวันที่เทศกาลและข้อความที่เกี่ยวข้อง
         const festivalImages = {
-            '04-14': { // วันครอบครัว: 14 เมษายน
-                alt: 'ภาพครอบครัวอบอุ่นในวันครอบครัว',
-                message: 'สุขสันต์วันครอบครัว'
-            },
-            '01-01': { // ปีใหม่: 1 มกราคม
-                alt: 'ภาพดอกไม้ไฟเฉลิมฉลองปีใหม่',
-                message: 'สวัสดีปีใหม่'
-            },
-            '04-13': { // สงกรานต์: 13-15 เมษายน
-                alt: 'ภาพการสาดน้ำในวันสงกรานต์',
-                message: 'สุขสันต์วันสงกรานต์'
-            },
-            '04-14-songkran': { // สงกรานต์วันที่ 14
-                alt: 'ภาพการสาดน้ำในวันสงกรานต์',
-                message: 'สุขสันต์วันสงกรานต์'
-            },
-            '04-15': { // สงกรานต์วันที่ 15
-                alt: 'ภาพการสาดน้ำในวันสงกรานต์',
-                message: 'สุขสันต์วันสงกรานต์'
-            },
-            '12-25': { // คริสต์มาส: 25 ธันวาคม
-                alt: 'ภาพต้นคริสต์มาสและของขวัญ',
-                message: 'สุขสันต์วันคริสต์มาส'
-            },
-            '11-12': { // ลอยกระทง: ตัวอย่าง 12 พ.ย. 2025
-                alt: 'ภาพกระทงลอยในแม่น้ำยามค่ำคืน',
-                message: 'สุขสันต์วันลอยกระทง'
-            },
-            '01-29': { // ตรุษจีน: ตัวอย่าง 29 ม.ค. 2025
-                alt: 'ภาพโคมแดงในวันตรุษจีน',
-                message: 'สวัสดีวันตรุษจีน'
-            },
-            '02-14': { // วาเลนไทน์: 14 ก.พ.
-                alt: 'ภาพหัวใจและดอกกุหลาบในวันวาเลนไทน์',
-                message: 'รักหวานฉ่ำในวันวาเลนไทน์'
-            },
-            '02-12': { // วันมาฆบูชา: ตัวอย่าง 12 ก.พ. 2025
-                alt: 'ภาพเทียนในพิธีเวียนเทียนวันมาฆบูชา',
-                message: 'วันมาฆบูชา ขอให้จิตใจสงบ'
-            },
-            'buddhist': { // วันพระ
-                alt: 'ภาพพระพุทธรูปในวันพระ',
-                message: 'วันพระ ขอให้จิตใจผ่องใส'
-            }
+            '04-14': { alt: 'ภาพครอบครัวอบอุ่นในวันครอบครัว', message: 'สุขสันต์วันครอบครัว' },
+            '01-01': { alt: 'ภาพดอกไม้ไฟเฉลิมฉลองปีใหม่', message: 'สวัสดีปีใหม่' },
+            '04-13': { alt: 'ภาพการสาดน้ำในวันสงกรานต์', message: 'สุขสันต์วันสงกรานต์' },
+            '04-14-songkran': { alt: 'ภาพการสาดน้ำในวันสงกรานต์', message: 'สุขสันต์วันสงกรานต์' },
+            '04-15': { alt: 'ภาพการสาดน้ำในวันสงกรานต์', message: 'สุขสันต์วันสงกรานต์' },
+            '12-25': { alt: 'ภาพต้นคริสต์มาสและของขวัญ', message: 'สุขสันต์วันคริสต์มาส' },
+            '11-12': { alt: 'ภาพกระทงลอยในแม่น้ำยามค่ำคืน', message: 'สุขสันต์วันลอยกระทง' },
+            '01-29': { alt: 'ภาพโคมแดงในวันตรุษจีน', message: 'สวัสดีวันตรุษจีน' },
+            '02-14': { alt: 'ภาพหัวใจและดอกกุหลาบในวันวาเลนไทน์', message: 'รักหวานฉ่ำในวันวาเลนไทน์' },
+            '02-12': { alt: 'ภาพเทียนในพิธีเวียนเทียนวันมาฆบูชา', message: 'วันมาฆบูชา ขอให้จิตใจสงบ' },
+            'buddhist': { alt: 'ภาพพระพุทธรูปในวันพระ', message: 'วันพระ ขอให้จิตใจผ่องใส' }
         };
 
-        // อ็อบเจ็กต์สำหรับข้อความอวยพร
+        const buddhistDays = [
+            '2025-01-06', '2025-01-13', '2025-01-20', '2025-01-27',
+            '2025-02-05', '2025-02-12', '2025-02-19', '2025-02-26',
+            '2025-03-06', '2025-03-13', '2025-03-20', '2025-03-27',
+            '2025-04-04', '2025-04-11', '2025-04-18', '2025-04-25'
+        ];
+
         const blessingOptions = {
             festival: [
                 { value: "1", text: "สวัสดีปีใหม่ ขอให้มีความสุขตลอดปี" },
@@ -451,212 +449,272 @@
             ]
         };
 
-        // ฟังก์ชันตรวจสอบวันที่และอัปเดตข้อความเทศกาล
         function updateFestivalMessage() {
-            const now = new Date();
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // เดือน 01-12
-            const day = String(now.getDate()).padStart(2, '0'); // วัน 01-31
-            const dateKey = `${month}-${day}`;
-            const festivalMessage = document.getElementById('festivalMessage');
+            try {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const dateKey = `${month}-${day}`;
+                const dateStr = `${year}-${month}-${day}`;
+                const festivalMessage = document.getElementById('festivalMessage');
 
-            // ตรวจสอบวันพระ (สมมติวันพระทุก 7 วัน เช่น วันที่ 7, 14, 21, 28)
-            const isBuddhistDay = [7, 14, 21, 28].includes(now.getDate());
-            if (isBuddhistDay) {
-                festivalMessage.textContent = festivalImages['buddhist'].message;
-                return;
-            }
+                if (buddhistDays.includes(dateStr)) {
+                    festivalMessage.textContent = festivalImages['buddhist'].message;
+                    return;
+                }
 
-            // ตรวจสอบเทศกาลอื่นๆ
-            if (festivalImages[dateKey]) {
-                festivalMessage.textContent = festivalImages[dateKey].message;
-            } else if (dateKey === '04-14') {
-                // กรณีวันที่ 14 เมษายนเป็นวันครอบครัว (ถ้าไม่มีสงกรานต์ทับ)
-                festivalMessage.textContent = festivalImages['04-14'].message;
-            } else {
-                // ซ่อนข้อความเทศกาลถ้าไม่ใช่วันเทศกาล
-                festivalMessage.textContent = '';
+                if (festivalImages[dateKey]) {
+                    festivalMessage.textContent = festivalImages[dateKey].message;
+                } else if (dateKey === '04-14') {
+                    festivalMessage.textContent = festivalImages['04-14'].message;
+                } else {
+                    festivalMessage.textContent = '';
+                }
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน updateFestivalMessage:', error);
             }
         }
 
-        // ฟังก์ชันอัปเดตภาพการ์ด
         function updateCardImage() {
-            const cardFront = document.getElementById('cardFront');
-            // รีเซ็ตพื้นหลังก่อนตั้งค่าใหม่
-            cardFront.style.background = 'none';
-            // ตรวจสอบว่า URL ถูกต้อง
-            const img = new Image();
-            img.src = currentImageUrl;
-            img.onload = () => {
-                cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
-                cardFront.style.backgroundSize = 'contain';
-            };
-            img.onerror = () => {
-                // ใช้ภาพเริ่มต้นหากโหลดไม่สำเร็จ
-                cardFront.style.background = `url('image/default.jpg') center/contain no-repeat`;
-                cardFront.style.backgroundSize = 'contain';
-                currentImageUrl = 'image/default.jpg';
-                localStorage.setItem('currentImage', currentImageUrl);
-            };
+            try {
+                const cardFront = document.getElementById('cardFront');
+                cardFront.style.background = 'none';
+                const img = new Image();
+                img.src = currentImageUrl;
+                img.onload = () => {
+                    cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
+                    cardFront.style.backgroundSize = 'contain';
+                };
+                img.onerror = () => {
+                    cardFront.style.background = `url('image/default.jpg') center/contain no-repeat`;
+                    cardFront.style.backgroundSize = 'contain';
+                    currentImageUrl = 'image/default.jpg';
+                    localStorage.setItem('currentImage', currentImageUrl);
+                    console.warn('ภาพไม่สามารถโหลดได้ ใช้ภาพเริ่มต้นแทน');
+                };
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน updateCardImage:', error);
+            }
         }
 
-        // อัปเดตภาพและข้อความเมื่อโหลดหน้าเว็บ
-        updateCardImage();
-        updateFestivalMessage();
+        try {
+            updateCardImage();
+            updateFestivalMessage();
+        } catch (error) {
+            console.error('ข้อผิดพลาดเมื่อเริ่มต้น:', error);
+        }
 
-        // อัปเดตตัวเลือกคำอวยพร
         function updateBlessingOptions() {
-            const messageType = document.getElementById('messageType').value;
-            const blessingSelect = document.getElementById('blessing');
-            blessingSelect.innerHTML = '';
-            const options = blessingOptions[messageType];
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option.value;
-                opt.textContent = option.text;
-                blessingSelect.appendChild(opt);
-            });
-            toggleCustomMessage();
+            try {
+                const messageType = document.getElementById('messageType').value;
+                const blessingSelect = document.getElementById('blessing');
+                blessingSelect.innerHTML = '';
+                const options = blessingOptions[messageType];
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    blessingSelect.appendChild(opt);
+                });
+                toggleCustomMessage();
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน updateBlessingOptions:', error);
+            }
         }
 
         function toggleCustomMessage() {
-            const blessingSelect = document.getElementById('blessing');
-            const customMessage = document.getElementById('customMessage');
-            if (blessingSelect.value === 'custom') {
-                customMessage.style.display = 'block';
-            } else {
-                customMessage.style.display = 'none';
-                customMessage.value = '';
+            try {
+                const blessingSelect = document.getElementById('blessing');
+                const customMessage = document.getElementById('customMessage');
+                customMessage.style.display = blessingSelect.value === 'custom' ? 'block' : 'none';
+                if (blessingSelect.value !== 'custom') {
+                    customMessage.value = '';
+                }
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน toggleCustomMessage:', error);
             }
         }
 
         function updateDateTime() {
-            const now = new Date();
-            const options = {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            };
-            const dateTimeString = now.toLocaleString('th-TH', options)
-                .replace(' ', ' ')
-                .replace(',', '');
-            document.getElementById('datetime').textContent = dateTimeString;
+            try {
+                const now = new Date();
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                };
+                const dateTimeString = now.toLocaleString('th-TH', options)
+                    .replace(' ', ' ')
+                    .replace(',', '');
+                document.getElementById('datetime').textContent = dateTimeString;
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน updateDateTime:', error);
+            }
         }
 
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
         function showProgress() {
-            const overlay = document.getElementById('progressOverlay');
-            const progressBar = document.getElementById('progressBar');
-            overlay.style.display = 'flex';
-            let progress = 0;
-            progressBar.style.width = '0%';
-            progressBar.textContent = '0%';
-            const interval = setInterval(() => {
-                progress += 10;
-                progressBar.style.width = `${progress}%`;
-                progressBar.textContent = `${progress}%`;
-                if (progress >= 100) {
-                    clearInterval(interval);
-                }
-            }, 100);
+            try {
+                const overlay = document.getElementById('progressOverlay');
+                const progressBar = document.getElementById('progressBar');
+                overlay.style.display = 'flex';
+                let progress = 0;
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0%';
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${progress}%`;
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน showProgress:', error);
+            }
         }
 
         function hideProgress() {
-            document.getElementById('progressOverlay').style.display = 'none';
+            try {
+                document.getElementById('progressOverlay').style.display = 'none';
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน hideProgress:', error);
+            }
         }
 
         function flipCard() {
-            document.getElementById('card').classList.toggle('flipped');
+            try {
+                const card = document.getElementById('card');
+                card.classList.toggle('flipped');
+                console.log('การ์ดพลิก:', card.classList.contains('flipped') ? 'ด้านหลัง' : 'ด้านหน้า');
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน flipCard:', error);
+            }
         }
 
-        // เพิ่มการรองรับการแตะเพื่อพลิกการ์ด
-        document.getElementById('cardFront').addEventListener('touchstart', (e) => {
-            // ป้องกันการแตะปุ่ม "ถัดไป"
-            if (!e.target.closest('button')) {
-                flipCard();
-            }
-        });
-
         function showPopup(message) {
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('popup').style.display = 'block';
-            document.getElementById('popupOverlay').style.display = 'block';
+            try {
+                document.getElementById('popupMessage').textContent = message;
+                document.getElementById('popup').style.display = 'block';
+                document.getElementById('popupOverlay').style.display = 'block';
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน showPopup:', error);
+            }
         }
 
         function hidePopup() {
-            document.getElementById('popup').style.display = 'none';
-            document.getElementById('popupOverlay').style.display = 'none';
+            try {
+                document.getElementById('popup').style.display = 'none';
+                document.getElementById('popupOverlay').style.display = 'none';
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน hidePopup:', error);
+            }
+        }
+
+        function updateImagePreview() {
+            try {
+                const imageSelect = document.getElementById('imageSelect').value;
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.innerHTML = '';
+                if (imageSelect) {
+                    const img = document.createElement('img');
+                    img.src = imageSelect;
+                    img.alt = 'ตัวอย่างภาพ';
+                    img.onerror = () => {
+                        imagePreview.innerHTML = '<p>ไม่สามารถโหลดตัวอย่างภาพได้</p>';
+                    };
+                    imagePreview.appendChild(img);
+                } else {
+                    imagePreview.innerHTML = '<p>เลือกภาพเพื่อดูตัวอย่าง</p>';
+                }
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน updateImagePreview:', error);
+            }
         }
 
         function showImagePopup() {
-            const imageSelect = document.getElementById('imageSelect');
-            imageSelect.innerHTML = '';
-            availableImages.forEach(image => {
-                const opt = document.createElement('option');
-                opt.value = image.value;
-                opt.textContent = image.text;
-                imageSelect.appendChild(opt);
-            });
-            // ตั้งค่าเริ่มต้นเป็นภาพปัจจุบัน (ถ้าเป็นพาธใน \image\)
-            if (currentImageUrl.startsWith('image/')) {
-                imageSelect.value = currentImageUrl;
+            try {
+                const imageSelect = document.getElementById('imageSelect');
+                imageSelect.innerHTML = '<option value="">-- เลือกภาพ --</option>';
+                availableImages.forEach(image => {
+                    const opt = document.createElement('option');
+                    opt.value = image.value;
+                    opt.textContent = image.text;
+                    imageSelect.appendChild(opt);
+                });
+                if (currentImageUrl.startsWith('image/')) {
+                    imageSelect.value = currentImageUrl;
+                }
+                document.getElementById('imageFile').value = '';
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.innerHTML = '<p>เลือกภาพเพื่อดูตัวอย่าง</p>';
+                document.getElementById('imagePopup').style.display = 'block';
+                document.getElementById('imagePopupOverlay').style.display = 'block';
+                updateImagePreview();
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน showImagePopup:', error);
             }
-            document.getElementById('imageFile').value = ''; // รีเซ็ตช่องอัปโหลด
-            document.getElementById('imagePopup').style.display = 'block';
-            document.getElementById('imagePopupOverlay').style.display = 'block';
         }
 
         function hideImagePopup() {
-            document.getElementById('imagePopup').style.display = 'none';
-            document.getElementById('imagePopupOverlay').style.display = 'none';
+            try {
+                document.getElementById('imagePopup').style.display = 'none';
+                document.getElementById('imagePopupOverlay').style.display = 'none';
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน hideImagePopup:', error);
+            }
         }
 
         function changeImage() {
-            const imageSelect = document.getElementById('imageSelect').value;
-            const imageFile = document.getElementById('imageFile').files[0];
+            try {
+                const imageSelect = document.getElementById('imageSelect').value;
+                const imageFile = document.getElementById('imageFile').files[0];
 
-            if (imageFile) {
-                // กรณีอัปโหลดภาพ
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageDataUrl = e.target.result;
-                    // ตรวจสอบว่า Data URL ถูกต้อง
-                    if (imageDataUrl.startsWith('data:image/')) {
-                        showProgress();
-                        setTimeout(() => {
-                            localStorage.setItem('currentImage', imageDataUrl);
-                            currentImageUrl = imageDataUrl;
-                            updateCardImage();
-                            hideProgress();
-                            hideImagePopup();
-                            showPopup('อัปโหลดรูปภาพสำเร็จ!');
-                        }, 1000);
-                    } else {
-                        showPopup('ไฟล์ที่อัปโหลดไม่ใช่รูปภาพที่ถูกต้อง');
-                    }
-                };
-                reader.onerror = () => {
-                    showPopup('เกิดข้อผิดพลาดในการอ่านไฟล์ภาพ');
-                };
-                reader.readAsDataURL(imageFile);
-            } else if (imageSelect) {
-                // กรณีเลือกภาพจาก \image\
-                showProgress();
-                setTimeout(() => {
-                    localStorage.setItem('currentImage', imageSelect);
-                    currentImageUrl = imageSelect;
-                    updateCardImage();
-                    hideProgress();
-                    hideImagePopup();
-                    showPopup('เปลี่ยนรูปภาพสำเร็จ!');
-                }, 1000);
-            } else {
-                showPopup('กรุณาเลือกรูปภาพหรืออัปโหลดไฟล์');
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageDataUrl = e.target.result;
+                        if (imageDataUrl.startsWith('data:image/')) {
+                            showProgress();
+                            setTimeout(() => {
+                                localStorage.setItem('currentImage', imageDataUrl);
+                                currentImageUrl = imageDataUrl;
+                                updateCardImage();
+                                hideProgress();
+                                hideImagePopup();
+                                showPopup('อัปโหลดรูปภาพสำเร็จ!');
+                            }, 1000);
+                        } else {
+                            showPopup('ไฟล์ที่อัปโหลดไม่ใช่รูปภาพที่ถูกต้อง');
+                        }
+                    };
+                    reader.onerror = () => {
+                        showPopup('เกิดข้อผิดพลาดในการอ่านไฟล์ภาพ');
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else if (imageSelect) {
+                    showProgress();
+                    setTimeout(() => {
+                        localStorage.setItem('currentImage', imageSelect);
+                        currentImageUrl = imageSelect;
+                        updateCardImage();
+                        hideProgress();
+                        hideImagePopup();
+                        showPopup('เปลี่ยนรูปภาพสำเร็จ!');
+                    }, 1000);
+                } else {
+                    showPopup('กรุณาเลือกรูปภาพหรืออัปโหลดไฟล์');
+                }
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน changeImage:', error);
+                showPopup('เกิดข้อผิดพลาดในการเปลี่ยนรูปภาพ');
             }
         }
 
@@ -672,102 +730,105 @@
                 }
                 return new Blob([u8arr], { type: mime });
             } catch (error) {
-                throw new Error('ไม่สามารถแปลง Data URL เป็น Blob');
+                throw new Error('ไม่สามารถแปลง Data URL เป็น Blob: ' + error.message);
             }
         }
 
         function submitBlessing() {
-            const botToken = localStorage.getItem('botToken');
-            const chatId = localStorage.getItem('chatId');
+            try {
+                const botToken = localStorage.getItem('botToken');
+                const chatId = localStorage.getItem('chatId');
 
-            if (!botToken || !chatId) {
-                showPopup('กรุณาตั้งค่า Bot Token และ Chat ID ก่อน\nไปที่การตั้งค่าโดยคลิกไอคอนฟันเฟืองใน Navbar');
-                return;
-            }
-
-            const messageTypeSelect = document.getElementById('messageType');
-            const messageTypeText = messageTypeSelect.options[messageTypeSelect.selectedIndex].text;
-            const blessingSelect = document.getElementById('blessing');
-            let blessingText = blessingSelect.options[blessingSelect.selectedIndex].text;
-
-            if (blessingSelect.value === 'custom') {
-                blessingText = document.getElementById('customMessage').value.trim();
-                if (!blessingText) {
-                    showPopup('กรุณาพิมพ์คำอวยพร');
+                if (!botToken || !chatId) {
+                    showPopup('กรุณาตั้งค่า Bot Token และ Chat ID ก่อน\nไปที่การตั้งค่าโดยคลิกไอคอนฟันเฟืองใน Navbar');
                     return;
                 }
+
+                const messageTypeSelect = document.getElementById('messageType');
+                const messageTypeText = messageTypeSelect.options[messageTypeSelect.selectedIndex].text;
+                const blessingSelect = document.getElementById('blessing');
+                let blessingText = blessingSelect.options[blessingSelect.selectedIndex].text;
+
+                if (blessingSelect.value === 'custom') {
+                    blessingText = document.getElementById('customMessage').value.trim();
+                    if (!blessingText) {
+                        showPopup('กรุณาพิมพ์คำอวยพร');
+                        return;
+                    }
+                }
+
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+
+                if (!firstName || !lastName) {
+                    showPopup('กรุณากรอกชื่อ-นามสกุลและหน่วยงาน/จังหวัด');
+                    return;
+                }
+
+                const message = `<b>📜 ${messageTypeText}</b>\n\n` +
+                               `<b>คำอวยพร:</b> ${blessingText}\n` +
+                               `<b>ชื่อ-นามสกุล:</b> ${firstName}\n` +
+                               `<b>ข้อความ :</b> ${lastName}\n` +
+                               `\n<i>วันที่:</i> ${new Date().toLocaleString('th-TH')}`;
+
+                const popupMessage = `📜 ${messageTypeText}\n\n` +
+                                     `คำอวยพร: ${blessingText}\n` +
+                                     `ชื่อ-นามสกุล: ${firstName}\n` +
+                                     `ข้อความ : ${lastName}\n` +
+                                     `วันที่: ${new Date().toLocaleString('th-TH')}`;
+
+                showProgress();
+                setTimeout(() => {
+                    sendPhotoToTelegram()
+                        .then(data => {
+                            if (!data.ok) {
+                                throw new Error(data.description);
+                            }
+                            return sendMessageToTelegram(message);
+                        })
+                        .then(data => {
+                            hideProgress();
+                            if (data.ok) {
+                                showPopup(`${popupMessage}\n\nส่งสำเร็จ!`);
+                            } else {
+                                showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${data.description}`);
+                            }
+                            flipCard();
+                        })
+                        .catch(error => {
+                            hideProgress();
+                            showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${error.message}`);
+                            flipCard();
+                        });
+                }, 1000);
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน submitBlessing:', error);
+                showPopup('เกิดข้อผิดพลาดในการส่งข้อความ');
             }
-
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-
-            if (!firstName || !lastName) {
-                showPopup('กรุณากรอกชื่อ-นามสกุลและหน่วยงาน/จังหวัด');
-                return;
-            }
-
-            const message = `<b>📜 ${messageTypeText}</b>\n\n` +
-                           `<b>คำอวยพร:</b> ${blessingText}\n` +
-                           `<b>ชื่อ-นามสกุล:</b> ${firstName}\n` +
-                           `<b>ข้อความ :</b> ${lastName}\n` +
-                           `\n<i>วันที่:</i> ${new Date().toLocaleString('th-TH')}`;
-
-            const popupMessage = `📜 ${messageTypeText}\n\n` +
-                                 `คำอวยพร: ${blessingText}\n` +
-                                 `ชื่อ-นามสกุล: ${firstName}\n` +
-                                 `ข้อความ : ${lastName}\n` +
-                                 `วันที่: ${new Date().toLocaleString('th-TH')}`;
-
-            showProgress();
-            setTimeout(() => {
-                sendPhotoToTelegram()
-                    .then(data => {
-                        if (!data.ok) {
-                            throw new Error(data.description);
-                        }
-                        return sendMessageToTelegram(message);
-                    })
-                    .then(data => {
-                        hideProgress();
-                        if (data.ok) {
-                            showPopup(`${popupMessage}\n\nส่งสำเร็จ!`);
-                        } else {
-                            showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${data.description}`);
-                        }
-                        flipCard();
-                    })
-                    .catch(error => {
-                        hideProgress();
-                        showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${error.message}`);
-                        flipCard();
-                    });
-            }, 1000);
         }
 
         function sendPhotoToTelegram() {
-            const botToken = localStorage.getItem('botToken');
-            const chatId = localStorage.getItem('chatId');
-            const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+            try {
+                const botToken = localStorage.getItem('botToken');
+                const chatId = localStorage.getItem('chatId');
+                const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
-            if (currentImageUrl.startsWith('image/')) {
-                // กรณีเป็นพาธไฟล์ใน \image\
-                return fetch(currentImageUrl)
-                    .then(response => {
-                        if (!response.ok) throw new Error('ไม่สามารถโหลดภาพจาก \image\');
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        const formData = new FormData();
-                        formData.append('chat_id', chatId);
-                        formData.append('photo', blob, 'image.jpg');
-                        return fetch(url, {
-                            method: 'POST',
-                            body: formData
-                        }).then(response => response.json());
-                    });
-            } else {
-                // กรณีเป็น Data URL จากการอัปโหลด
-                try {
+                if (currentImageUrl.startsWith('image/')) {
+                    return fetch(currentImageUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error('ไม่สามารถโหลดภาพจาก \image\');
+                            return response.blob();
+                        })
+                        .then(blob => {
+                            const formData = new FormData();
+                            formData.append('chat_id', chatId);
+                            formData.append('photo', blob, 'image.jpg');
+                            return fetch(url, {
+                                method: 'POST',
+                                body: formData
+                            }).then(response => response.json());
+                        });
+                } else {
                     const blob = dataURLtoBlob(currentImageUrl);
                     const formData = new FormData();
                     formData.append('chat_id', chatId);
@@ -776,21 +837,103 @@
                         method: 'POST',
                         body: formData
                     }).then(response => response.json());
-                } catch (error) {
-                    throw new Error('ไม่สามารถแปลงภาพที่อัปโหลดได้');
                 }
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน sendPhotoToTelegram:', error);
+                throw error;
             }
         }
 
         function sendMessageToTelegram(message) {
-            const botToken = localStorage.getItem('botToken');
-            const chatId = localStorage.getItem('chatId');
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
-            return fetch(url)
-                .then(response => response.json());
+            try {
+                const botToken = localStorage.getItem('botToken');
+                const chatId = localStorage.getItem('chatId');
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
+                return fetch(url)
+                    .then(response => response.json());
+            } catch (error) {
+                console.error('ข้อผิดพลาดใน sendMessageToTelegram:', error);
+                throw error;
+            }
         }
 
-        updateBlessingOptions();
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const flipButton = document.getElementById('flipButton');
+                if (flipButton) {
+                    flipButton.addEventListener('click', flipCard);
+                    flipButton.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        flipCard();
+                    });
+                } else {
+                    console.error('ไม่พบปุ่ม flipButton');
+                }
+
+                const confirmImageButton = document.getElementById('confirmImageButton');
+                if (confirmImageButton) {
+                    confirmImageButton.addEventListener('click', changeImage);
+                    confirmImageButton.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        changeImage();
+                    });
+                } else {
+                    console.error('ไม่พบปุ่ม confirmImageButton');
+                }
+
+                const imagePopupLink = document.getElementById('imagePopupLink');
+                if (imagePopupLink) {
+                    imagePopupLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showImagePopup();
+                    });
+                } else {
+                    console.error('ไม่พบ imagePopupLink');
+                }
+
+                const cardFront = document.getElementById('cardFront');
+                if (cardFront) {
+                    cardFront.addEventListener('touchstart', (e) => {
+                        if (!e.target.closest('button')) {
+                            e.preventDefault();
+                            flipCard();
+                        }
+                    });
+                } else {
+                    console.error('ไม่พบ cardFront');
+                }
+
+                const imageFileInput = document.getElementById('imageFile');
+                if (imageFileInput) {
+                    imageFileInput.addEventListener('change', () => {
+                        const file = imageFileInput.files[0];
+                        const imagePreview = document.getElementById('imagePreview');
+                        imagePreview.innerHTML = '';
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.alt = 'ตัวอย่างภาพที่อัปโหลด';
+                                imagePreview.appendChild(img);
+                            };
+                            reader.onerror = () => {
+                                imagePreview.innerHTML = '<p>ไม่สามารถโหลดตัวอย่างภาพได้</p>';
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            imagePreview.innerHTML = '<p>เลือกภาพเพื่อดูตัวอย่าง</p>';
+                        }
+                    });
+                } else {
+                    console.error('ไม่พบ imageFile input');
+                }
+
+                updateBlessingOptions();
+            } catch (error) {
+                console.error('ข้อผิดพลาดในการตั้งค่าเหตุการณ์:', error);
+            }
+        });
     </script>
 </body>
 </html>

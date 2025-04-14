@@ -189,7 +189,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
-        .image-change-popup {
+        .image-select-popup {
             display: none;
             position: fixed;
             top: 50%;
@@ -203,28 +203,28 @@
             text-align: center;
             width: 300px;
         }
-        .image-change-popup h3 {
+        .image-select-popup h3 {
             margin-bottom: 15px;
             font-size: clamp(16px, 2vw, 20px);
         }
-        .image-change-popup input {
+        .image-select-popup select {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
             font-size: clamp(12px, 1.5vw, 16px);
         }
-        .image-change-popup .button-group {
+        .image-select-popup .button-group {
             display: flex;
             justify-content: space-between;
         }
-        .image-change-popup button {
+        .image-select-popup button {
             width: 48%;
             padding: 8px;
         }
-        .image-change-popup .close-btn {
+        .image-select-popup .close-btn {
             background-color: #f44336;
         }
-        .image-change-popup .close-btn:hover {
+        .image-select-popup .close-btn:hover {
             background-color: #d32f2f;
         }
         .datetime {
@@ -246,7 +246,7 @@
             .datetime {
                 font-size: clamp(10px, 1.2vw, 14px);
             }
-            .image-change-popup {
+            .image-select-popup {
                 width: 90%;
             }
             .front .festival-message {
@@ -259,7 +259,7 @@
     <div class="navbar">
         <div class="datetime" id="datetime"></div>
         <div class="right-links">
-            <a href="#" onclick="showImageChangePopup()"><i class="fas fa-image"></i></a>
+            <a href="#" onclick="showImageSelectPopup()"><i class="fas fa-image"></i></a>
             <a href="settings.html"><i class="fas fa-cog"></i></a>
         </div>
     </div>
@@ -312,74 +312,79 @@
         <button onclick="hidePopup()">ตกลง</button>
     </div>
 
-    <!-- Image Change Popup HTML -->
-    <div class="popup-overlay" id="imageChangeOverlay"></div>
-    <div class="image-change-popup" id="imageChangePopup">
-        <h3>อัปโหลดรูปภาพ</h3>
-        <input type="file" id="imageFile" accept="image/*">
+    <!-- Image Select Popup HTML -->
+    <div class="popup-overlay" id="imageSelectOverlay"></div>
+    <div class="image-select-popup" id="imageSelectPopup">
+        <h3>เลือกรูปภาพ</h3>
+        <select id="imageSelect">
+            <!-- ตัวเลือกจะถูกเพิ่มโดย JavaScript -->
+        </select>
         <div class="button-group">
-            <button onclick="changeImage()">อัปโหลด</button>
-            <button class="close-btn" onclick="hideImageChangePopup()">ปิด</button>
+            <button onclick="changeImage()">เลือก</button>
+            <button class="close-btn" onclick="hideImageSelectPopup()">ปิด</button>
         </div>
     </div>
 
     <script>
         let currentImageUrl = localStorage.getItem('currentImage') || 'image/default.jpg';
 
-        // กำหนดวันที่เทศกาลและภาพที่เกี่ยวข้อง
+        // รายการภาพที่สามารถเลือกได้จาก \image\
+        const availableImages = [
+            { value: 'image/default.jpg', text: 'ภาพเริ่มต้น' },
+            { value: 'image/family_day.jpg', text: 'วันครอบครัว' },
+            { value: 'image/new_year.jpg', text: 'ปีใหม่' },
+            { value: 'image/songkran.jpg', text: 'สงกรานต์' },
+            { value: 'image/christmas.jpg', text: 'คริสต์มาส' },
+            { value: 'image/loy_krathong.jpg', text: 'ลอยกระทง' },
+            { value: 'image/buddhist_day.jpg', text: 'วันพระ' },
+            { value: 'image/chinese_new_year.jpg', text: 'ตรุษจีน' },
+            { value: 'image/valentine.jpg', text: 'วาเลนไทน์' },
+            { value: 'image/makha_bucha.jpg', text: 'วันมาฆบูชา' }
+        ];
+
+        // กำหนดวันที่เทศกาลและข้อความที่เกี่ยวข้อง
         const festivalImages = {
             '04-14': { // วันครอบครัว: 14 เมษายน
-                url: 'image/family_day.jpg',
                 alt: 'ภาพครอบครัวอบอุ่นในวันครอบครัว',
                 message: 'สุขสันต์วันครอบครัว'
             },
             '01-01': { // ปีใหม่: 1 มกราคม
-                url: 'image/new_year.jpg',
                 alt: 'ภาพดอกไม้ไฟเฉลิมฉลองปีใหม่',
                 message: 'สวัสดีปีใหม่'
             },
             '04-13': { // สงกรานต์: 13-15 เมษายน
-                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '04-14-songkran': { // สงกรานต์วันที่ 14
-                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '04-15': { // สงกรานต์วันที่ 15
-                url: 'image/songkran.jpg',
                 alt: 'ภาพการสาดน้ำในวันสงกรานต์',
                 message: 'สุขสันต์วันสงกรานต์'
             },
             '12-25': { // คริสต์มาส: 25 ธันวาคม
-                url: 'image/christmas.jpg',
                 alt: 'ภาพต้นคริสต์มาสและของขวัญ',
                 message: 'สุขสันต์วันคริสต์มาส'
             },
             '11-12': { // ลอยกระทง: ตัวอย่าง 12 พ.ย. 2025
-                url: 'image/loy_krathong.jpg',
                 alt: 'ภาพกระทงลอยในแม่น้ำยามค่ำคืน',
                 message: 'สุขสันต์วันลอยกระทง'
             },
             '01-29': { // ตรุษจีน: ตัวอย่าง 29 ม.ค. 2025
-                url: 'image/chinese_new_year.jpg',
                 alt: 'ภาพโคมแดงในวันตรุษจีน',
                 message: 'สวัสดีวันตรุษจีน'
             },
             '02-14': { // วาเลนไทน์: 14 ก.พ.
-                url: 'image/valentine.jpg',
                 alt: 'ภาพหัวใจและดอกกุหลาบในวันวาเลนไทน์',
                 message: 'รักหวานฉ่ำในวันวาเลนไทน์'
             },
             '02-12': { // วันมาฆบูชา: ตัวอย่าง 12 ก.พ. 2025
-                url: 'image/makha_bucha.jpg',
                 alt: 'ภาพเทียนในพิธีเวียนเทียนวันมาฆบูชา',
                 message: 'วันมาฆบูชา ขอให้จิตใจสงบ'
             },
             'buddhist': { // วันพระ
-                url: 'image/buddhist_day.jpg',
                 alt: 'ภาพพระพุทธรูปในวันพระ',
                 message: 'วันพระ ขอให้จิตใจผ่องใส'
             }
@@ -416,40 +421,42 @@
             ]
         };
 
-        // ฟังก์ชันตรวจสอบวันที่และเปลี่ยนภาพ/ข้อความตามเทศกาล
-        function updateFestivalImage() {
+        // ฟังก์ชันตรวจสอบวันที่และอัปเดตข้อความเทศกาล
+        function updateFestivalMessage() {
             const now = new Date();
             const month = String(now.getMonth() + 1).padStart(2, '0'); // เดือน 01-12
             const day = String(now.getDate()).padStart(2, '0'); // วัน 01-31
             const dateKey = `${month}-${day}`;
-            const cardFront = document.getElementById('cardFront');
             const festivalMessage = document.getElementById('festivalMessage');
 
             // ตรวจสอบวันพระ (สมมติวันพระทุก 7 วัน เช่น วันที่ 7, 14, 21, 28)
             const isBuddhistDay = [7, 14, 21, 28].includes(now.getDate());
             if (isBuddhistDay) {
-                cardFront.style.background = `url('${festivalImages['buddhist'].url}') center/contain no-repeat`;
                 festivalMessage.textContent = festivalImages['buddhist'].message;
                 return;
             }
 
             // ตรวจสอบเทศกาลอื่นๆ
             if (festivalImages[dateKey]) {
-                cardFront.style.background = `url('${festivalImages[dateKey].url}') center/contain no-repeat`;
                 festivalMessage.textContent = festivalImages[dateKey].message;
             } else if (dateKey === '04-14') {
                 // กรณีวันที่ 14 เมษายนเป็นวันครอบครัว (ถ้าไม่มีสงกรานต์ทับ)
-                cardFront.style.background = `url('${festivalImages['04-14'].url}') center/contain no-repeat`;
                 festivalMessage.textContent = festivalImages['04-14'].message;
             } else {
-                // ใช้ภาพเริ่มต้นและซ่อนข้อความเทศกาลถ้าไม่ใช่วันเทศกาล
-                cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
+                // ซ่อนข้อความเทศกาลถ้าไม่ใช่วันเทศกาล
                 festivalMessage.textContent = '';
             }
         }
 
+        // ฟังก์ชันอัปเดตภาพการ์ด
+        function updateCardImage() {
+            const cardFront = document.getElementById('cardFront');
+            cardFront.style.background = `url('${currentImageUrl}') center/contain no-repeat`;
+        }
+
         // อัปเดตภาพและข้อความเมื่อโหลดหน้าเว็บ
-        updateFestivalImage();
+        updateCardImage();
+        updateFestivalMessage();
 
         // อัปเดตตัวเลือกคำอวยพร
         function updateBlessingOptions() {
@@ -533,44 +540,40 @@
             document.getElementById('popupOverlay').style.display = 'none';
         }
 
-        function showImageChangePopup() {
-            document.getElementById('imageChangePopup').style.display = 'block';
-            document.getElementById('imageChangeOverlay').style.display = 'block';
-            document.getElementById('imageFile').value = '';
+        function showImageSelectPopup() {
+            const imageSelect = document.getElementById('imageSelect');
+            imageSelect.innerHTML = '';
+            availableImages.forEach(image => {
+                const opt = document.createElement('option');
+                opt.value = image.value;
+                opt.textContent = image.text;
+                imageSelect.appendChild(opt);
+            });
+            // ตั้งค่าเริ่มต้นเป็นภาพปัจจุบัน
+            imageSelect.value = currentImageUrl;
+            document.getElementById('imageSelectPopup').style.display = 'block';
+            document.getElementById('imageSelectOverlay').style.display = 'block';
         }
 
-        function hideImageChangePopup() {
-            document.getElementById('imageChangePopup').style.display = 'none';
-            document.getElementById('imageChangeOverlay').style.display = 'none';
+        function hideImageSelectPopup() {
+            document.getElementById('imageSelectPopup').style.display = 'none';
+            document.getElementById('imageSelectOverlay').style.display = 'none';
         }
 
         function changeImage() {
-            const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageDataUrl = e.target.result;
-                    showProgress();
-                    setTimeout(() => {
-                        localStorage.setItem('currentImage', imageDataUrl);
-                        currentImageUrl = imageDataUrl;
-                        // อัปเดตภาพถ้าไม่ใช่วันเทศกาล
-                        const now = new Date();
-                        const month = String(now.getMonth() + 1).padStart(2, '0');
-                        const day = String(now.getDate()).padStart(2, '0');
-                        const dateKey = `${month}-${day}`;
-                        const isBuddhistDay = [7, 14, 21, 28].includes(now.getDate());
-                        if (!festivalImages[dateKey] && !isBuddhistDay) {
-                            document.getElementById('cardFront').style.background = `url('${imageDataUrl}') center/contain no-repeat`;
-                        }
-                        hideProgress();
-                        hideImageChangePopup();
-                        showPopup('อัปโหลดรูปภาพสำเร็จ!');
-                    }, 1000);
-                };
-                reader.readAsDataURL(imageFile);
+            const imageSelect = document.getElementById('imageSelect').value;
+            if (imageSelect) {
+                showProgress();
+                setTimeout(() => {
+                    localStorage.setItem('currentImage', imageSelect);
+                    currentImageUrl = imageSelect;
+                    updateCardImage();
+                    hideProgress();
+                    hideImageSelectPopup();
+                    showPopup('เปลี่ยนรูปภาพสำเร็จ!');
+                }, 1000);
             } else {
-                showPopup('กรุณาเลือกไฟล์รูปภาพ');
+                showPopup('กรุณาเลือกรูปภาพ');
             }
         }
 
@@ -658,16 +661,31 @@
             const botToken = localStorage.getItem('botToken');
             const chatId = localStorage.getItem('chatId');
             const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
-            const blob = dataURLtoBlob(currentImageUrl);
-            const formData = new FormData();
-            formData.append('chat_id', chatId);
-            formData.append('photo', blob, 'image.jpg');
 
-            return fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json());
+            // ถ้า currentImageUrl เป็นพาธไฟล์ใน \image\ ให้โหลดเป็น Blob
+            if (currentImageUrl.startsWith('image/')) {
+                return fetch(currentImageUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const formData = new FormData();
+                        formData.append('chat_id', chatId);
+                        formData.append('photo', blob, 'image.jpg');
+                        return fetch(url, {
+                            method: 'POST',
+                            body: formData
+                        }).then(response => response.json());
+                    });
+            } else {
+                // กรณีเป็น Data URL จากการอัปโหลดครั้งก่อน (ถ้ามี)
+                const blob = dataURLtoBlob(currentImageUrl);
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', blob, 'image.jpg');
+                return fetch(url, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json());
+            }
         }
 
         function sendMessageToTelegram(message) {
